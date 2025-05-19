@@ -25,9 +25,9 @@
       color: #00e6e6;
       margin-bottom: 1rem;
     }
-    .score {
+    .score, .high-score {
       font-size: 1.3rem;
-      margin-bottom: 2rem;
+      margin-bottom: 1rem;
     }
     .card {
       background: rgba(255, 255, 255, 0.1);
@@ -99,6 +99,7 @@
 </head>
 <body>
   <h1>Solo Mode - Guess the AI or Human</h1>
+  <div class="high-score" id="highScore">High Score: 0</div>
   <div class="score">Score: <span id="score">0</span></div>
   <div class="card" id="quoteCard">Loading quote...</div>
   <div class="result" id="result"></div>
@@ -109,9 +110,8 @@
   <button class="restart" id="restartBtn" style="display:none;">Restart Game</button>
 
   <script>
-    // Sample quotes: label: 'human' or 'ai', text: quote string
     const quotes = [
-      { label: 'human', text: "I can't believe I ate the whole pizza... again." },
+{ label: 'human', text: "I can't believe I ate the whole pizza... again." },
 { label: 'human', text: "Why do I always forget my keys in the fridge?" },
 { label: 'human', text: "I swear my cat judges me when I cry during movies." },
 { label: 'human', text: "I just spent 10 minutes looking for my phone while holding it." },
@@ -217,7 +217,8 @@
 { label: 'human', text: "I just laughed at my own joke before I finished telling it." },
 { label: 'human', text: "I’m not a singer, but my car concerts are Grammy-worthy." },
 { label: 'human', text: "I just waved at someone and realized they were waving at the person behind me." },
-{ label: 'human', text: "I’m not a morning person—I’m a ‘why is the world like this’ person." },,
+{ label: 'human', text: "I’m not a morning person—I’m a ‘why is the world like this’ person." },
+      { label: 'ai', text: "I sometimes wonder if the stars miss watching us when the sun is out." },
 { label: 'ai', text: "Laughter is the best algorithm for happiness." },
 { label: 'ai', text: "Do you think clouds ever get tired of floating?" },
 { label: 'ai', text: "Memories are like fingerprints—no two are exactly alike." },
@@ -330,13 +331,17 @@
     let currentIndex = 0;
 
     const scoreEl = document.getElementById('score');
+    const highScoreEl = document.getElementById('highScore');
     const quoteCard = document.getElementById('quoteCard');
     const resultEl = document.getElementById('result');
     const btnHuman = document.getElementById('btnHuman');
     const btnAI = document.getElementById('btnAI');
     const restartBtn = document.getElementById('restartBtn');
 
-    // Shuffle quotes on start
+    // Load high score or default to 0
+    let highScore = localStorage.getItem('botOrNotHighScore') || 0;
+    highScoreEl.textContent = `High Score: ${highScore}`;
+
     function shuffle(array) {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -346,12 +351,19 @@
     }
 
     function loadQuote() {
-      if(currentIndex >= quotes.length){
-        quoteCard.textContent = "Game Over! Your final score: " + score;
+      if (currentIndex >= quotes.length) {
+        quoteCard.textContent = `Game Over! Your final score: ${score}`;
         btnHuman.style.display = "none";
         btnAI.style.display = "none";
         restartBtn.style.display = "inline-block";
         resultEl.textContent = "";
+
+        if (score > highScore) {
+          highScore = score;
+          localStorage.setItem('botOrNotHighScore', highScore);
+          highScoreEl.textContent = `High Score: ${highScore}`;
+          alert("🎉 New High Score! 🎉");
+        }
         return;
       }
       quoteCard.textContent = quotes[currentIndex].text;
@@ -359,12 +371,12 @@
     }
 
     function guess(isHumanGuess) {
-      if(currentIndex >= quotes.length) return;
+      if (currentIndex >= quotes.length) return;
 
       const correct = (isHumanGuess && quotes[currentIndex].label === 'human') ||
                       (!isHumanGuess && quotes[currentIndex].label === 'ai');
 
-      if(correct){
+      if (correct) {
         score++;
         resultEl.textContent = "Correct! 🎉";
         resultEl.style.color = "#00e676"; // green
