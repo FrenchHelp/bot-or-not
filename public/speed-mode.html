@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Speed Mode - Bot or Not?</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    max-width: 600px;
+    margin: auto;
+    padding: 20px;
+    text-align: center;
+    background: #222;
+    color: #eee;
+  }
+  .quote {
+    font-size: 1.5rem;
+    margin: 40px 0;
+  }
+  button {
+    font-size: 1.25rem;
+    margin: 10px;
+    padding: 10px 30px;
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+  }
+  #btnHuman { background: #4CAF50; color: white; }
+  #btnAI { background: #f44336; color: white; }
+  #score {
+    font-size: 1.2rem;
+    margin-top: 20px;
+  }
+  #timer {
+    font-size: 1.3rem;
+    margin-top: 15px;
+    color: #ffcc00;
+  }
+</style>
+</head>
+<body>
+
+<h1>Speed Mode - Bot or Not?</h1>
+<div class="quote" id="quote">Loading quote...</div>
+
+<button id="btnHuman">Human</button>
+<button id="btnAI">AI</button>
+
+<div id="timer">Time left: 10</div>
+<div id="score">Score: 0</div>
+
+<script>
+  const quotes = [
+    { text: "I love the smell of rain in the morning.", author: "Human" },
+    { text: "Artificial intelligence will redefine creativity.", author: "AI" },
+    { text: "Just had the best coffee ever!", author: "Human" },
+    { text: "The model predicted the weather with 90% accuracy.", author: "AI" },
+    // Add more quotes here
+  ];
+
+  let score = 0;
+  let currentQuoteIndex = 0;
+  let timeLeft = 10;
+  let timerInterval;
+
+  const quoteEl = document.getElementById('quote');
+  const btnHuman = document.getElementById('btnHuman');
+  const btnAI = document.getElementById('btnAI');
+  const scoreEl = document.getElementById('score');
+  const timerEl = document.getElementById('timer');
+
+  function startTimer() {
+    timeLeft = 10;
+    timerEl.textContent = `Time left: ${timeLeft}`;
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      timerEl.textContent = `Time left: ${timeLeft}`;
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        disableButtons();
+        nextQuote();
+      }
+    }, 1000);
+  }
+
+  function loadQuote() {
+    if (currentQuoteIndex >= quotes.length) {
+      quoteEl.textContent = "Game Over! Your final score is " + score;
+      disableButtons();
+      timerEl.textContent = "";
+      return;
+    }
+    quoteEl.textContent = quotes[currentQuoteIndex].text;
+    enableButtons();
+    startTimer();
+  }
+
+  function disableButtons() {
+    btnHuman.disabled = true;
+    btnAI.disabled = true;
+  }
+
+  function enableButtons() {
+    btnHuman.disabled = false;
+    btnAI.disabled = false;
+  }
+
+  function checkAnswer(answer) {
+    clearInterval(timerInterval);
+    const correct = (answer === (quotes[currentQuoteIndex].author === "AI" ? "AI" : "Human"));
+    if (correct) {
+      score++;
+      scoreEl.textContent = `Score: ${score}`;
+    }
+    disableButtons();
+    setTimeout(() => {
+      nextQuote();
+    }, 1000);
+  }
+
+  function nextQuote() {
+    currentQuoteIndex++;
+    loadQuote();
+  }
+
+  btnHuman.addEventListener('click', () => checkAnswer("Human"));
+  btnAI.addEventListener('click', () => checkAnswer("AI"));
+
+  // Start game
+  loadQuote();
+</script>
+
+</body>
+</html>
