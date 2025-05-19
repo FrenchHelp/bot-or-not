@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bot or Not? - AI Guessing Party Game</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(270deg, #0f2027, #203a43, #2c5364);
+      background-size: 600% 600%;
+      animation: floatGradient 20s ease infinite;
+      color: white;
+    }
+    header {
+      background-color: #111;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.8rem;
+      color: #00e6e6;
+    }
+    nav a {
+      color: #fff;
+      margin-left: 2rem;
+      text-decoration: none;
+      font-weight: 600;
+      position: relative;
+      padding-bottom: 2px;
+    }
+    nav a::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      background: #00e6e6;
+      left: 0;
+      bottom: 0;
+      transition: width 0.3s ease;
+    }
+    nav a:hover::after {
+      width: 100%;
+    }
+    .hero {
+      padding: 4rem 2rem;
+      text-align: center;
+    }
+    .hero h2 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0;
+      animation: fadeInUp 0.8s ease-out 0.2s forwards;
+    }
+    .hero p {
+      font-size: 1.2rem;
+      max-width: 600px;
+      margin: 0 auto 2rem;
+      opacity: 0;
+      animation: fadeInUp 0.8s ease-out 0.5s forwards;
+    }
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      padding: 2rem;
+    }
+    .feature {
+      background-color: rgba(255, 255, 255, 0.05);
+      padding: 1.5rem;
+      border-radius: 12px;
+      text-align: center;
+      transition: background-color 0.3s, transform 0.3s;
+      opacity: 0;
+      animation: fadeInUp 0.8s ease-out forwards;
+    }
+    .feature:hover {
+      background-color: rgba(255, 255, 255, 0.15);
+      transform: scale(1.05);
+    }
+    .feature:nth-child(1) { animation-delay: 0.7s; }
+    .feature:nth-child(2) { animation-delay: 0.9s; }
+    .feature:nth-child(3) { animation-delay: 1.1s; }
+    .feature:nth-child(4) { animation-delay: 1.3s; }
+    .how-to-play {
+      max-width: 700px;
+      margin: 3rem auto 4rem;
+      padding: 0 1rem;
+      opacity: 0;
+      animation: fadeInUp 0.8s ease-out 1.6s forwards;
+    }
+    .how-to-play h3 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      font-size: 2rem;
+      color: #00e6e6;
+    }
+    .how-to-play ol {
+      list-style: none;
+      counter-reset: step-counter;
+      padding-left: 0;
+    }
+    .how-to-play li {
+      margin-bottom: 1.2rem;
+      font-size: 1.1rem;
+      padding-left: 3rem;
+      position: relative;
+    }
+    .how-to-play li::before {
+      counter-increment: step-counter;
+      content: counter(step-counter);
+      position: absolute;
+      left: 0;
+      top: 0;
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: #00e6e6;
+      background: rgba(0, 230, 230, 0.15);
+      border-radius: 50%;
+      width: 2rem;
+      height: 2rem;
+      text-align: center;
+      line-height: 2rem;
+    }
+    .contact {
+      background-color: #111;
+      padding: 2rem;
+      text-align: center;
+      opacity: 0;
+      animation: fadeInUp 0.8s ease-out 1.9s forwards;
+    }
+    .contact h3 {
+      margin-bottom: 1rem;
+    }
+    .contact p {
+      margin-bottom: 1.5rem;
+    }
+    .contact form {
+      display: flex;
+      flex-direction: column;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .contact input, .contact textarea {
+      padding: 0.8rem;
+      margin-bottom: 1rem;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+    }
+    .contact button {
+      padding: 0.8rem;
+      background-color: #00e6e6;
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s, box-shadow 0.3s;
+    }
+    .contact button:hover {
+      background-color: #00bfbf;
+      box-shadow: 0 0 8px #00e6e6;
+    }
+    footer {
+      text-align: center;
+      padding: 1rem;
+      background-color: #000;
+      color: #888;
+    }
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @keyframes floatGradient {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+    .play-now-btn {
+  display: inline-block;
+  margin-top: 1.5rem;
+  padding: 1rem 2rem;
+  background-color: #00e6e6;
+  color: #000;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 50px;
+  text-decoration: none;
+  box-shadow: 0 0 12px #00e6e6;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  animation: pulse 2s infinite;
+}
+.play-now-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px #00ffff;
+}
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 12px #00e6e6;
+  }
+  50% {
+    box-shadow: 0 0 24px #00ffff;
+  }
+}
+
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Bot or Not?</h1>
+    <nav>
+      <a href="#about">About</a>
+      <a href="#features">Features</a>
+      <a href="#howtoplay">How to Play</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <section class="hero" id="about">
+    <h2>Can You Outsmart the AI?</h2>
+    <p>Welcome to <strong>Bot or Not?</strong> – the party game where your goal is simple: figure out who’s a real person... and who’s just a really clever AI. Play with friends or strangers and try to survive each round without getting exposed!</p>
+<a href="play" class="play-now-btn">▶ Play Now</a>
+
+  </section>
+
+  <section class="features" id="features">
+    <div class="feature">
+      <h3>🎭 Bluff Like a Bot</h3>
+      <p>Fake it till you make it. As a human, your goal is to sound like an AI and throw off the scent.</p>
+    </div>
+    <div class="feature">
+      <h3>🤖 AI in Disguise</h3>
+      <p>Some players are secretly AI – can you spot the cold, calculated responses from the real ones?</p>
+    </div>
+    <div class="feature">
+      <h3>💬 Social & Chaotic</h3>
+      <p>Play with friends or join random parties. It's chaotic fun packed with weird questions and surprising answers.</p>
+    </div>
+    <div class="feature">
+      <h3>📸 Share Your Rounds</h3>
+      <p>Capture hilarious moments and post them to your socials with our built-in snapshot mode.</p>
+    </div>
+  </section>
+
+  <section class="how-to-play" id="howtoplay">
+    <h3>How to Play Bot or Not?</h3>
+    <ol>
+      <li><strong>Classic Mode</strong><br>Play with 4–8 players. Guess which ones are AIs and which are humans each round.</li>
+      <li><strong>Speed Mode</strong><br>Answer fast! Timed rounds to test your quick thinking and bluffing skills.</li>
+      <li><strong>Solo Mode</strong><br>Challenge yourself by chatting with multiple profiles and guess who’s the human.</li>
+      <li><strong>Private Rooms</strong><br>Create a room with your friends for exclusive, hilarious sessions.</li>
+      <li><strong>Share & Replay</strong><br>Capture your funniest moments and share them instantly on socials.</li>
+    </ol>
+  </section>
+
+  <section class="contact" id="contact">
+    <h3>Contact Us</h3>
+    <p>Have questions or feedback? Drop us a message!</p>
+    <form>
+      <input type="text" placeholder="Your Name" required />
+      <input type="email" placeholder="Your Email" required />
+      <textarea rows="5" placeholder="Your Message" required></textarea>
+      <button type="submit">Send Message</button>
+    </form>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 Bot or Not? All rights reserved.</p>
+  </footer>
+</body>
+</html>
