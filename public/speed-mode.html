@@ -1,135 +1,209 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Speed Mode - Bot or Not?</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    max-width: 600px;
-    margin: auto;
-    padding: 20px;
-    text-align: center;
-    background: #222;
-    color: #eee;
-  }
-  .quote {
-    font-size: 1.5rem;
-    margin: 40px 0;
-  }
-  button {
-    font-size: 1.25rem;
-    margin: 10px;
-    padding: 10px 30px;
-    cursor: pointer;
-    border: none;
-    border-radius: 8px;
-  }
-  #btnHuman { background: #4CAF50; color: white; }
-  #btnAI { background: #f44336; color: white; }
-  #score {
-    font-size: 1.2rem;
-    margin-top: 20px;
-  }
-  #timer {
-    font-size: 1.3rem;
-    margin-top: 15px;
-    color: #ffcc00;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Speed Mode - Bot or Not?</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(270deg, #0f2027, #203a43, #2c5364);
+      background-size: 600% 600%;
+      animation: floatGradient 20s ease infinite;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 1rem;
+      text-align: center;
+    }
+    h1 {
+      color: #00e6e6;
+      margin-bottom: 1rem;
+    }
+    .score, .timer {
+      font-size: 1.3rem;
+      margin-bottom: 0.5rem;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      max-width: 600px;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 0 20px rgba(0, 230, 230, 0.3);
+      font-size: 1.4rem;
+      line-height: 1.5;
+      min-height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: fadeInUp 0.6s ease;
+    }
+    .buttons {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+    button {
+      background-color: #00e6e6;
+      border: none;
+      color: #000;
+      font-weight: bold;
+      padding: 1rem 2.5rem;
+      border-radius: 50px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      box-shadow: 0 0 12px #00e6e6;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 25px #00ffff;
+    }
+    .result {
+      font-size: 1.2rem;
+      min-height: 1.5rem;
+      font-weight: bold;
+    }
+    .restart {
+      background-color: #ff3864;
+      color: white;
+      margin-top: 1rem;
+      box-shadow: 0 0 12px #ff3864;
+    }
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @keyframes floatGradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+  </style>
 </head>
 <body>
+  <h1>Speed Mode - Bot or Not?</h1>
+  <div class="timer">⏱ Time Left: <span id="timeLeft">30</span>s</div>
+  <div class="score">Score: <span id="score">0</span></div>
+  <div class="card" id="quoteCard">Loading quote...</div>
+  <div class="result" id="result"></div>
+  <div class="buttons">
+    <button id="btnHuman">Human</button>
+    <button id="btnAI">AI</button>
+  </div>
+  <button class="restart" id="restartBtn" style="display:none;">Restart</button>
 
-<h1>Speed Mode - Bot or Not?</h1>
-<div class="quote" id="quote">Loading quote...</div>
+  <script>
+    const quotes = [
+      { label: 'human', text: "I just tripped over my own shadow." },
+      { label: 'human', text: "Why does autocorrect always betray me?" },
+      { label: 'human', text: "My dog barks every time I say 'banana'." },
+      { label: 'ai', text: "Do shadows dream of becoming light?" },
+      { label: 'ai', text: "A whisper carries further in the heart than in the ear." },
+      { label: 'ai', text: "I wonder if rain ever envies the snow." }
+    ];
 
-<button id="btnHuman">Human</button>
-<button id="btnAI">AI</button>
+    let time = 30;
+    let timer;
+    let score = 0;
+    let currentIndex = 0;
 
-<div id="timer">Time left: 10</div>
-<div id="score">Score: 0</div>
+    const timeEl = document.getElementById('timeLeft');
+    const scoreEl = document.getElementById('score');
+    const quoteCard = document.getElementById('quoteCard');
+    const resultEl = document.getElementById('result');
+    const btnHuman = document.getElementById('btnHuman');
+    const btnAI = document.getElementById('btnAI');
+    const restartBtn = document.getElementById('restartBtn');
 
-<script>
-  const quotes = [
-    { text: "I love the smell of rain in the morning.", author: "Human" },
-    { text: "Artificial intelligence will redefine creativity.", author: "AI" },
-    { text: "Just had the best coffee ever!", author: "Human" },
-    { text: "The model predicted the weather with 90% accuracy.", author: "AI" },
-    // Add more quotes here
-  ];
-
-  let score = 0;
-  let currentQuoteIndex = 0;
-  let timeLeft = 10;
-  let timerInterval;
-
-  const quoteEl = document.getElementById('quote');
-  const btnHuman = document.getElementById('btnHuman');
-  const btnAI = document.getElementById('btnAI');
-  const scoreEl = document.getElementById('score');
-  const timerEl = document.getElementById('timer');
-
-  function startTimer() {
-    timeLeft = 10;
-    timerEl.textContent = `Time left: ${timeLeft}`;
-    timerInterval = setInterval(() => {
-      timeLeft--;
-      timerEl.textContent = `Time left: ${timeLeft}`;
-      if (timeLeft <= 0) {
-        clearInterval(timerInterval);
-        disableButtons();
-        nextQuote();
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
       }
-    }, 1000);
-  }
-
-  function loadQuote() {
-    if (currentQuoteIndex >= quotes.length) {
-      quoteEl.textContent = "Game Over! Your final score is " + score;
-      disableButtons();
-      timerEl.textContent = "";
-      return;
     }
-    quoteEl.textContent = quotes[currentQuoteIndex].text;
-    enableButtons();
-    startTimer();
-  }
 
-  function disableButtons() {
-    btnHuman.disabled = true;
-    btnAI.disabled = true;
-  }
-
-  function enableButtons() {
-    btnHuman.disabled = false;
-    btnAI.disabled = false;
-  }
-
-  function checkAnswer(answer) {
-    clearInterval(timerInterval);
-    const correct = (answer === (quotes[currentQuoteIndex].author === "AI" ? "AI" : "Human"));
-    if (correct) {
-      score++;
-      scoreEl.textContent = `Score: ${score}`;
+    function loadQuote() {
+      if (currentIndex >= quotes.length) currentIndex = 0;
+      quoteCard.textContent = quotes[currentIndex].text;
+      resultEl.textContent = "";
     }
-    disableButtons();
-    setTimeout(() => {
-      nextQuote();
-    }, 1000);
-  }
 
-  function nextQuote() {
-    currentQuoteIndex++;
+    function guess(isHuman) {
+      if (time <= 0) return;
+
+      const correct = (isHuman && quotes[currentIndex].label === 'human') ||
+                      (!isHuman && quotes[currentIndex].label === 'ai');
+
+      if (correct) {
+        score++;
+        resultEl.textContent = "Correct!";
+        resultEl.style.color = "#00e676";
+      } else {
+        resultEl.textContent = "Wrong!";
+        resultEl.style.color = "#ff3d00";
+      }
+
+      scoreEl.textContent = score;
+      currentIndex++;
+      loadQuote();
+    }
+
+    function startTimer() {
+      timer = setInterval(() => {
+        time--;
+        timeEl.textContent = time;
+
+        if (time <= 0) {
+          clearInterval(timer);
+          endGame();
+        }
+      }, 1000);
+    }
+
+    function endGame() {
+      quoteCard.textContent = `⏰ Time's up! Your score: ${score}`;
+      btnHuman.style.display = 'none';
+      btnAI.style.display = 'none';
+      resultEl.textContent = '';
+      restartBtn.style.display = 'inline-block';
+    }
+
+    function restartGame() {
+      score = 0;
+      time = 30;
+      currentIndex = 0;
+      scoreEl.textContent = score;
+      timeEl.textContent = time;
+      btnHuman.style.display = 'inline-block';
+      btnAI.style.display = 'inline-block';
+      restartBtn.style.display = 'none';
+      shuffle(quotes);
+      loadQuote();
+      startTimer();
+    }
+
+    btnHuman.addEventListener('click', () => guess(true));
+    btnAI.addEventListener('click', () => guess(false));
+    restartBtn.addEventListener('click', restartGame);
+
+    // Init
+    shuffle(quotes);
     loadQuote();
-  }
-
-  btnHuman.addEventListener('click', () => checkAnswer("Human"));
-  btnAI.addEventListener('click', () => checkAnswer("AI"));
-
-  // Start game
-  loadQuote();
-</script>
-
+    startTimer();
+  </script>
 </body>
 </html>
